@@ -1,4 +1,10 @@
 #include <iostream>
+#include <cstdio>
+#include <array>
+#include <memory>
+#include <stdexcept>
+#include <bits/stdc++.h>
+#include <algorithm>
 #include <cstdlib>
 #include <fstream>
 #include <string>
@@ -6,7 +12,23 @@
 // visit dpp.dev for this dependency ;)
 #include <dpp/dpp.h>
 
+
 const std::string AUTHOR_ID = "708857740965183559";
+
+std::string exec(std::string command) {
+   char buffer[128];
+   std::string result = "";
+   FILE* pipe = popen(command.c_str(), "r");
+   if (!pipe) {
+      return "popen failed!";
+   }
+   while (!feof(pipe)) {
+      if (fgets(buffer, 128, pipe) != NULL)
+         result += buffer;
+   }
+   pclose(pipe);
+   return result;
+}
 
 int main() {
     std::ifstream tokenfile ("token.txt");
@@ -38,19 +60,44 @@ int main() {
                 event.reply(usermention + " é " + gay + "% gay.");
             }
         }
+        if (event.command.get_command_name() == "notify-karbox-pc") {
+            std::string message = std::get<std::string>(event.get_parameter("notification"));
+            std::string whosent = event.command.get_issuing_user().username;
+            event.reply("message sent.");
+
+            std::replace(message.begin(), message.end(), '\'', char(' '));
+            std::replace(message.begin(), message.end(), '"', char(' '));
+            std::replace(message.begin(), message.end(), ';', char(' '));
+            std::replace(message.begin(), message.end(), '>', char(' '));
+
+            exec("notify-send 'C++ Discord Project' '" + whosent + " sent: " + message + "'");
+        }
     });
 
     bot.on_ready([&bot](const dpp::ready_t& event) {
-        if (dpp::run_once<struct register_bot_commands>()) {
-	        dpp::slashcommand rafaela("rafaela", "mostra o que a rafaela realmente é.", bot.me.id);
-            dpp::slashcommand gaytest("gaytest", "mostra o quão gay você é.", bot.me.id);
-            gaytest.add_option(
-                dpp::command_option(dpp::co_user, "who", "Quem?", true)
-            );
-	        bot.global_command_create(rafaela);
-            bot.global_command_create(gaytest);
-        }
+      bot.set_presence(
+        dpp::presence(dpp::presence_status::ps_online,
+          dpp::activity_type::at_watching,
+          "KarboXXX code nonstop."
+        )
+      );
+      if (dpp::run_once<struct register_bot_commands>()) {
+        dpp::slashcommand rafaela("rafaela", "mostra o que a rafaela realmente é.", bot.me.id);
+        dpp::slashcommand gaytest("gaytest", "mostra o quão gay você é.", bot.me.id);
+        gaytest.add_option(
+            dpp::command_option(dpp::co_user, "who", "Quem?", true)
+        );
+        dpp::slashcommand notify("notify-karbox-pc", "manda uma notificação pro computador do karbox.", bot.me.id);
+        notify.add_option(
+            dpp::command_option(dpp::co_string, "notification", "Notificação em texto.", true)
+        );
+
+
+	      bot.global_command_create(rafaela);
+        bot.global_command_create(gaytest);
+        bot.global_command_create(notify);
+      }
     });
-    
+
     bot.start(dpp::st_wait);
 }
