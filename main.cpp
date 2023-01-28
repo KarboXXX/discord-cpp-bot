@@ -16,7 +16,7 @@
 #include "./extra-responses.hpp"
 
 // visit dpp.dev for this dependency ;)
-#include "./dpp/dpp.h"
+#include <dpp/dpp.h>
 
 
 const std::string AUTHOR_ID = "708857740965183559";
