@@ -12,8 +12,11 @@
 #include <fstream>
 #include <string>
 
+#include "./presences.hpp"
+#include "./extra-responses.hpp"
+
 // visit dpp.dev for this dependency ;)
-#include <dpp/dpp.h>
+#include "./dpp/dpp.h"
 
 
 const std::string AUTHOR_ID = "708857740965183559";
@@ -61,8 +64,10 @@ int main() {
     dpp::cluster bot(token, dpp::i_default_intents | dpp::i_message_content);
     bot.on_log(dpp::utility::cout_logger());
 
-    bot.on_message_create([&bot, main_updates, ohio_updates] (const dpp::message_create_t & event) {
-        if (event.msg.content == "please bot, shutdown" || event.msg.content == "bot, die") {
+    bot.on_message_create([&bot, main_updates, ohio_updates] (const dpp::message_create_t &event) {
+        if (event.msg.content.find("bot") != std::string::npos && 
+            (event.msg.content.find("shutdown") != std::string::npos || 
+            event.msg.content.find("die") != std::string::npos)) {
             if ((event.msg.author.id).operator nlohmann::json() == AUTHOR_ID) {
                 bot.message_create(dpp::message(
                     event.msg.channel_id, "as you wish.")
@@ -104,32 +109,8 @@ int main() {
             }
         }
 
-        if (event.msg.content == "javascript") bot.message_create(dpp::message(event.msg.channel_id, "high-level").set_reference(event.msg.id));
-
-        if (event.msg.content == "python") bot.message_create(dpp::message(
-            event.msg.channel_id, "high-level as shit")
-            .set_reference(event.msg.id));
-
-        if (event.msg.content == "C#") bot.message_create(dpp::message(
-            event.msg.channel_id, "high-level as shit, but Windows")
-            .set_reference(event.msg.id));
-
-        if (event.msg.content == "Java") bot.message_create(dpp::message(
-            event.msg.channel_id, "high-level as s... oh minecraft!")
-            .set_reference(event.msg.id));
-
-        if (event.msg.content == "Linux") bot.message_create(dpp::message(
-            event.msg.channel_id, "I KNOW RIGHT?? :smiley:")
-            .set_reference(event.msg.id));
-
-        // https://tenor.com/view/prob-proboscis-monkey-nosaty-kahau-nosaty-kahau-gif-23018177
-        if (event.msg.content == "monke villager") bot.message_create(dpp::message(
-            event.msg.channel_id, "https://tenor.com/view/prob-proboscis-monkey-nosaty-kahau-nosaty-kahau-gif-23018177")
-            .set_reference(event.msg.id));
-
-        if (event.msg.content == "rafaela") bot.message_create(dpp::message(
-            event.msg.channel_id, "ah n essa puta dnv?")
-            .set_reference(event.msg.id));
+        Extras extra;
+        extra.responses(event, bot);
 
         if (event.msg.content == PREFIX + "help") {
             dpp::embed embed = dpp::embed().
@@ -277,31 +258,6 @@ int main() {
         bot.execute_webhook_sync(main_updates, embed);
         bot.execute_webhook_sync(ohio_updates, embed);
 
-        class Presences {
-            public:
-                void servers_type(dpp::cluster &r_bot) {
-                    r_bot.current_user_get_guilds([&](const dpp::confirmation_callback_t &callback) {
-                        if (!callback.is_error()) {
-                            dpp::guild_map guildMap = std::get<dpp::guild_map>(callback.value);
-                            int gs = 0;
-                            for (auto g = guildMap.begin(); g != guildMap.end(); ++g) {gs++;}
-                            r_bot.set_presence(dpp::presence(dpp::presence_status::ps_online, dpp::activity_type::at_listening,
-                                    std::to_string(gs) + std::string(" servers.")
-                                )
-                            );
-                        }
-                    });
-                }
-
-                void default_type(dpp::cluster &r_bot) {
-                    r_bot.set_presence(dpp::presence(dpp::presence_status::ps_dnd, dpp::activity_type::at_watching, "KarboXXX code nonstop."));
-                }
-
-                void suggestions_type(dpp::cluster &r_bot) {
-                    r_bot.set_presence(dpp::presence(dpp::presence_status::ps_idle, dpp::activity_type::at_listening, "suggestions..."));
-                }
-        };
-
         Presences presences;
         presences.default_type(bot);
 
@@ -333,10 +289,11 @@ int main() {
         couple.add_option( dpp::command_option(dpp::co_user, "user1", "Primeira pessoa", true) );
         couple.add_option( dpp::command_option(dpp::co_user, "user2", "Segunda pessoa", true) );
 
-        bot.global_command_create(couple);
-        bot.global_command_create(gaytest);
-        bot.global_command_create(putatest);
-        bot.global_command_create(notify);
+        // bot.global_command_create(couple);
+        // bot.global_command_create(gaytest);
+        // bot.global_command_create(putatest);
+        // bot.global_command_create(notify);
+        bot.global_bulk_command_create({couple, gaytest, putatest, notify});
       }
     });
 
