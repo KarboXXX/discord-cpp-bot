@@ -1,5 +1,5 @@
 <div align="center">
-<img width="300" height="200" src="http://codeprogramming.org/wp-content/uploads/2022/01/C-Logo.wine_.png"/>
+<img src="http://codeprogramming.org/wp-content/uploads/2022/01/C-Logo.wine_.png"/>
 <h1>KarboX C++ Discord Bot</h1>
 <b><p>A nice C++ discord bot made by me!</p></b>
 <br>
