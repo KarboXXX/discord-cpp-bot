@@ -1,5 +1,5 @@
 <div align="center">
-<img src="http://codeprogramming.org/wp-content/uploads/2022/01/C-Logo.wine_.png"/>
+<img width="200" height="200" src="https://cdn-icons-png.flaticon.com/512/6132/6132222.png"/>
 <h1>KarboX C++ Discord Bot</h1>
 <b><p>A nice C++ discord bot made by me!</p></b>
 <br>
@@ -10,7 +10,6 @@
 
 [![codefactor](https://www.codefactor.io/repository/github/karboxxx/discord-cpp-bot/badge)](https://www.codefactor.io/repository/github/karboxxx/discord-cpp-bot)
 [![GitHub issues](https://img.shields.io/github/issues/KarboXXX/discord-cpp-bot)](https://github.com/KarboXXX/discord-cpp-bot/issues)
-[![GitHub license](https://img.shields.io/github/license/KarboXXX/discord-cpp-bot?color=brightgreen)](https://github.com/KarboXXX/discord-cpp-bot/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/KarboXXX/discord-cpp-bot?color=ff69b4)](https://github.com/KarboXXX/discord-cpp-bot/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/KarboXXX/discord-cpp-bot?color=ff69b4)](https://github.com/KarboXXX/discord-cpp-bot/network)
 </div>
