@@ -72,48 +72,36 @@ int main() {
     bot.on_log(dpp::utility::cout_logger());
 
     bot.on_message_create([&bot, main_updates, ohio_updates] (const dpp::message_create_t &event) {
-        if (event.msg.content.find("bot") != std::string::npos && 
+        if ((event.msg.content.find("bot") != std::string::npos && 
             (event.msg.content.find("shutdown") != std::string::npos || 
-            event.msg.content.find("die") != std::string::npos)) {
-            if ((event.msg.author.id).operator nlohmann::json() == AUTHOR_ID) {
-                bot.message_create(dpp::message(
-                    event.msg.channel_id, "as you wish.")
-                    .set_reference(event.msg.id));
-                sleep(5);
-                bot.shutdown();
-            } else {
-                bot.message_create(dpp::message(
-                    event.msg.channel_id, "no lmao")
-                    .set_reference(event.msg.id));
-            }
+            event.msg.content.find("die") != std::string::npos)) && 
+            (event.msg.author.id).operator nlohmann::json() == AUTHOR_ID) {
+            bot.message_create(dpp::message(event.msg.channel_id, "as you wish.")
+                .set_reference(event.msg.id));
+            sleep(5);
+            bot.shutdown();
         }
 
-        if (event.msg.content == "please bot, recompile" || event.msg.content == "bot recompile") {
-            if ((event.msg.author.id).operator nlohmann::json() == AUTHOR_ID) {
-                bot.message_create(dpp::message(
-                    event.msg.channel_id, "as you wish.")
-                    .set_reference(event.msg.id));
-                sleep(2);
-                std::string recompile = exec("make recompile");
-                sleep(10);
-                if (recompile.find("Leaving") != std::string::npos || recompile.find("Error") != std::string::npos) {
-                    dpp::message embed = dpp::message().add_embed(dpp::embed()
-                            .set_color(dpp::colors::red)
-                            .set_title(bot.me.username + " faced a recompile error")
-                            .add_field("Compile error!", "Something went wrong recompiling my code. Look at the terminal for more information.", true)
-                            .add_field("Verified.", "Only authorized webhooks can send this message.", true)
-                            .set_thumbnail(bot.me.get_avatar_url())
-                        );
-                    bot.execute_webhook_sync(main_updates, embed);
-                    bot.execute_webhook_sync(ohio_updates, embed);
-                }
-                sleep(2);
-                bot.shutdown();
-            } else {
-                bot.message_create(dpp::message(
-                    event.msg.channel_id, "no lmao")
-                    .set_reference(event.msg.id));
+        if ((event.msg.content == "please bot, recompile" || event.msg.content == "bot recompile") &&
+            (event.msg.author.id).operator nlohmann::json() == AUTHOR_ID) {
+            bot.message_create(dpp::message(event.msg.channel_id, "as you wish.")
+                .set_reference(event.msg.id));
+            sleep(2);
+            std::string recompile = exec("make recompile");
+            sleep(10);
+            if (recompile.find("Leaving") != std::string::npos || recompile.find("Error") != std::string::npos) {
+                dpp::message embed = dpp::message().add_embed(dpp::embed()
+                        .set_color(dpp::colors::red)
+                        .set_title(bot.me.username + " faced a recompile error")
+                        .add_field("Compile error!", "Something went wrong recompiling my code. Look at the terminal for more information.", true)
+                        .add_field("Verified.", "Only authorized webhooks can send this message.", true)
+                        .set_thumbnail(bot.me.get_avatar_url())
+                    );
+                bot.execute_webhook_sync(main_updates, embed);
+                bot.execute_webhook_sync(ohio_updates, embed);
             }
+            sleep(2);
+            bot.shutdown();
         }
 
         Extras extra;
