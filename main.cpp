@@ -7,13 +7,15 @@
 #include <bits/stdc++.h>
 #include <algorithm>
 #include <cstdlib>
+#include <ctime>
 #include <stdio.h>
 #include <sys/types.h>
 #include <fstream>
 #include <string>
 
-#include "./presences.hpp"
-#include "./extra-responses.hpp"
+#include "./headers/presences.hpp"
+#include "./headers/extra-responses.hpp"
+#include "./headers/avatar-manipulation.cpp"
 
 // visit dpp.dev for this dependency ;)
 #include <dpp/dpp.h>
@@ -35,6 +37,7 @@ std::string exec(std::string command) {
 }
 
 int main() {
+    srand(time(0));
     std::ifstream webhook_main_updates_channel ("updates1-webhook.txt");
     std::ifstream webhook_second_updates_channel ("updates2-webhook.txt");
     std::string updates_webhook_string, updates2_webhook_string;
@@ -52,12 +55,16 @@ int main() {
     } else {
         std::cout << "no webhook ohio's update url file" << std::endl;
     }
-    std::ifstream tokenfile ("token.txt");
+    std::fstream tokenfile ("token.txt");
     std::string token;
     if (tokenfile.is_open() && tokenfile.good()) {
         tokenfile >> token;
     } else {
-        std::cout << "file cointaining token either doesn't exist or don't have read permissions. create or fix token.txt file.";
+        std::cout << "file cointaining token either doesn't exist or don't have read permissions." << std::endl;
+	std::ofstream outfile("token.txt");
+	outfile << "your-token-here";
+	outfile.close();
+	std::cout << "a token file was created, replace all contents in the file with your token." << std::endl;
         exit(1);
     }
 
@@ -219,31 +226,41 @@ int main() {
             int porcent = std::rand() % 100;
             std::string loading_ascii = "█▒▒▒▒▒▒▒▒▒";
             std::uint32_t color = dpp::colors::red;
+            char* emoji = "./media/vomiting.png";
 
-            if (porcent >= 15) {
+            if (porcent >= 35) {
                 loading_ascii = "███▒▒▒▒▒▒▒";
+		emoji = "./media/thumbsup.png";
             }
             if (porcent >= 50) {
                 loading_ascii = "█████▒▒▒▒▒";
                 color = dpp::colors::forest_green;
+
             }
-            if (porcent >= 70) {
+            if (porcent >= 60) {
                 loading_ascii = "███████▒▒▒";
                 color = dpp::colors::lime;
+                emoji = "heart";
+
             }
             if (porcent >= 100) {
                 loading_ascii = "██████████";
             }
+
+            Avatar avatar;
+            avatar.run(user1.get_avatar_url(), user2.get_avatar_url(), emoji); //oh yeaaaahhhh damn babyyyyyyyyyy
+
             event.reply(dpp::message().add_embed(dpp::embed().set_color(color)
                 .set_title("Quão compatível será esse casal?")
                 .add_field("Casal", user1.get_mention() + " e " + user2.get_mention(), true)
                 .add_field("Compatibilidade", std::string(half_user1+half_user2)+" : **"+loading_ascii+"** "+std::to_string(porcent)+"%", true)
+                .set_image("attachment://result.png")
                 .set_timestamp(time(0))
                 .set_footer(dpp::embed_footer()
                     .set_icon(event.command.get_issuing_user().get_avatar_url())
                     .set_text(event.command.get_issuing_user().username)
                 )
-            ));
+            ).add_file("result.png", dpp::utility::read_file("result.png")));
         }
     });
 
