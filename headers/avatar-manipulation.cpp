@@ -11,7 +11,9 @@
 #include <algorithm>
 #include <curl/curl.h>
 #include <stdio.h>
-
+#include <fstream>
+#include <sys/stat.h>
+#include <unistd.h>
 
 class Avatar {
 private:
@@ -54,9 +56,16 @@ private:
     fclose(fp);
     return true;
   }
+  inline bool fileexists (const std::string& name) {
+    std::ifstream f(name.c_str());
+    return f.good();
+  }
 public:
   std::string run(std::string link1, std::string link2, char* middle, bool isDefaultAvatar) {
     const std::string resultname = std::to_string(std::rand()) + ".png";
+
+    Image blank(900*2, 900, 4);
+    memset(blank.data, 0, blank.size);
     
     std::string avatar1filename;
     std::string avatar2filename;
@@ -88,10 +97,7 @@ public:
     Image avatar(avatar1filename.c_str());
     Image avatar2(avatar2filename.c_str());
     Image copy = heart;
-    Image blank(900*2, 900, 4);
-    for (int i=0; i<blank.size; i++) {
-      blank.data[i] = 0;
-    }
+    
     heart = heart.resizeNN(round(heart.w*3), round(heart.h*3));
     avatar = avatar.resizeNN(384, 384);
     avatar2 = avatar2.resizeNN(384, 384);
