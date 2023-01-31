@@ -88,7 +88,7 @@ public:
     Image avatar(avatar1filename.c_str());
     Image avatar2(avatar2filename.c_str());
     Image copy = heart;
-    Image blank(900*2, 900, 3);
+    Image blank(900*2, 900, 4);
     for (int i=0; i<blank.size; i++) {
       blank.data[i] = 0;
     }
