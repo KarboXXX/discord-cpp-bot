@@ -79,7 +79,7 @@ Image& Image::crop(uint16_t cx, uint16_t cy, uint16_t cw, uint16_t ch) {
 
 	w = cw;
 	h = ch;
-	
+
 
 	delete[] data;
 	data = croppedImage;
@@ -119,7 +119,7 @@ Image& Image::overlay(const Image& source, int x, int y) {
 					for(int chnl = 0;chnl < channels;++chnl) {
 						dstPx[chnl] = (uint8_t)BYTE_BOUND((srcPx[chnl]/255.f * srcAlpha + dstPx[chnl]/255.f * dstAlpha * (1 - srcAlpha)) / outAlpha * 255.f);
 					}
-					if(channels > 3) { dstPx[3] = (uint8_t)BYTE_BOUND(outAlpha * 255.f); } 
+					if(channels > 3) { dstPx[3] = (uint8_t)BYTE_BOUND(outAlpha * 255.f); }
 				}
 			}
 		}

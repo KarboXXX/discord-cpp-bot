@@ -12,6 +12,7 @@
 #include <sys/types.h>
 #include <fstream>
 #include <string>
+#include <cmath>
 
 #include "./headers/presences.hpp"
 #include "./headers/extra-responses.hpp"
@@ -72,9 +73,9 @@ int main() {
     bot.on_log(dpp::utility::cout_logger());
 
     bot.on_message_create([&bot, main_updates, ohio_updates] (const dpp::message_create_t &event) {
-        if ((event.msg.content.find("bot") != std::string::npos && 
-            (event.msg.content.find("shutdown") != std::string::npos || 
-            event.msg.content.find("die") != std::string::npos)) && 
+        if ((event.msg.content.find("bot") != std::string::npos &&
+            (event.msg.content.find("shutdown") != std::string::npos ||
+            event.msg.content.find("die") != std::string::npos)) &&
             (event.msg.author.id).operator nlohmann::json() == AUTHOR_ID) {
             bot.message_create(dpp::message(event.msg.channel_id, "as you wish.")
                 .set_reference(event.msg.id));
@@ -208,8 +209,8 @@ int main() {
         if (event.command.get_command_name() == "couple") {
             dpp::user user1 = event.command.get_resolved_user(std::get<dpp::snowflake>(event.get_parameter("user1")));
             dpp::user user2 = event.command.get_resolved_user(std::get<dpp::snowflake>(event.get_parameter("user2")));
-            std::string half_user1 = user1.username.substr(0, user1.username.length()/2);
-            std::string half_user2 = user2.username.substr(user2.username.length()/2);
+            std::string half_user1 = user1.username.substr(0, round(user1.username.length()/2));
+            std::string half_user2 = user2.username.substr(round(user2.username.length()/2));
 
             int porcent = std::rand() % 100;
             std::string loading_ascii = "█▒▒▒▒▒▒▒▒▒";
@@ -218,7 +219,7 @@ int main() {
 
             if (porcent >= 35) {
                 loading_ascii = "███▒▒▒▒▒▒▒";
-		emoji = (char*)"./media/thumbsup.png";
+		            emoji = (char*)"./media/thumbsup.png";
             }
             if (porcent >= 50) {
                 loading_ascii = "█████▒▒▒▒▒";
@@ -236,19 +237,19 @@ int main() {
             }
 
             Avatar avatar;
-            avatar.run(user1.get_avatar_url(), user2.get_avatar_url(), emoji); //oh yeaaaahhhh damn babyyyyyyyyyy
-
+            std::string result = avatar.run(user1.get_avatar_url(), user2.get_avatar_url(), emoji); //oh yeaaaahhhh damn babyyyyyyyyyy
             event.reply(dpp::message().add_embed(dpp::embed().set_color(color)
                 .set_title("Quão compatível será esse casal?")
                 .add_field("Casal", user1.get_mention() + " e " + user2.get_mention(), true)
                 .add_field("Compatibilidade", std::string(half_user1+half_user2)+" : **"+loading_ascii+"** "+std::to_string(porcent)+"%", true)
-                .set_image("attachment://result.png")
+                .set_image("attachment://" + result)
                 .set_timestamp(time(0))
                 .set_footer(dpp::embed_footer()
                     .set_icon(event.command.get_issuing_user().get_avatar_url())
                     .set_text(event.command.get_issuing_user().username)
                 )
-            ).add_file("result.png", dpp::utility::read_file("result.png")));
+            ).add_file(result, dpp::utility::read_file(result)));
+            remove(result.c_str());
         }
     });
 
