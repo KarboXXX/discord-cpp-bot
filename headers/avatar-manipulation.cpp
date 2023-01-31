@@ -30,7 +30,7 @@ class Avatar {
             exec(std::string("wget -nc -q -O ./media/avatar.png ") + std::string(link1));
             exec(std::string("wget -nc -q -O ./media/avatar2.png ") + std::string(link2));
             
-            char* possible[] = {"./media/heart.png", "./media/sparkling-heart.png"};
+            char* possible[] = {(char*)"./media/heart.png", (char*)"./media/sparkling-heart.png"};
             std::string stringmiddle = middle;
             if (stringmiddle == "heart") {
                 middle = possible[std::rand() % 2];

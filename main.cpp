@@ -214,11 +214,11 @@ int main() {
             int porcent = std::rand() % 100;
             std::string loading_ascii = "█▒▒▒▒▒▒▒▒▒";
             std::uint32_t color = dpp::colors::red;
-            char* emoji = "./media/vomiting.png";
+            char* emoji = (char*)"./media/vomiting.png";
 
             if (porcent >= 35) {
                 loading_ascii = "███▒▒▒▒▒▒▒";
-		emoji = "./media/thumbsup.png";
+		emoji = (char*)"./media/thumbsup.png";
             }
             if (porcent >= 50) {
                 loading_ascii = "█████▒▒▒▒▒";
@@ -228,7 +228,7 @@ int main() {
             if (porcent >= 60) {
                 loading_ascii = "███████▒▒▒";
                 color = dpp::colors::lime;
-                emoji = "heart";
+                emoji = (char*)"heart";
 
             }
             if (porcent >= 100) {
