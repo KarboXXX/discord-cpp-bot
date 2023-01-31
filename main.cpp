@@ -211,7 +211,7 @@ int main() {
             dpp::user user2 = event.command.get_resolved_user(std::get<dpp::snowflake>(event.get_parameter("user2")));
             std::string half_user1 = user1.username.substr(0, round(user1.username.length()/2));
             std::string half_user2 = user2.username.substr(round(user2.username.length()/2));
-
+	    
             int porcent = std::rand() % 100;
             std::string loading_ascii = "█▒▒▒▒▒▒▒▒▒";
             std::uint32_t color = dpp::colors::red;
@@ -237,7 +237,9 @@ int main() {
             }
 
             Avatar avatar;
-            std::string result = avatar.run(user1.get_avatar_url(), user2.get_avatar_url(), emoji); //oh yeaaaahhhh damn babyyyyyyyyyy
+	    bool hasDefaultAvatar = (user1.get_avatar_url().find("embed") != std::string::npos) ||
+	                            (user2.get_avatar_url().find("embed") != std::string::npos);
+            std::string result = avatar.run(user1.get_avatar_url(), user2.get_avatar_url(), emoji, hasDefaultAvatar);
             event.reply(dpp::message().add_embed(dpp::embed().set_color(color)
                 .set_title("Quão compatível será esse casal?")
                 .add_field("Casal", user1.get_mention() + " e " + user2.get_mention(), true)
