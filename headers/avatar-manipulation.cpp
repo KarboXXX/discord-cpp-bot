@@ -1,8 +1,8 @@
 #include "image.hpp"
 #include "image-processing.cpp"
 #include "image.hpp"
-#include "stb_image_write.h"
-#include "stb_image.h"
+#include "./stb/stb_image_write.h"
+#include "./stb/stb_image.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
