@@ -6,6 +6,8 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
+#define AVATARMANIPULATION 1
+
 #include <iostream>
 #include <cmath>
 #include <algorithm>
@@ -61,11 +63,14 @@ private:
     return f.good();
   }
 public:
+  unsigned long createRGBA(int r, int g, int b, int a) { return ((r & 0xff) << 24) + ((g & 0xff) << 16) + ((b & 0xff) << 8) + (a & 0xff); }
+  unsigned long createRGB(int r, int g, int b)         { return ((r & 0xff) << 16) + ((g & 0xff) << 8) + (b & 0xff); }
+  
   std::string run(std::string link1, std::string link2, char* middle, bool isDefaultAvatar) {
     const std::string resultname = std::to_string(std::rand()) + ".png";
 
     Image blank(900*2, 900, 4);
-    memset(blank.data, 0, blank.size);
+    memset(blank.data, createRGBA(0, 0, 0, 0), blank.size);
     
     std::string avatar1filename;
     std::string avatar2filename;
@@ -108,6 +113,15 @@ public:
     blank.write(resultname.c_str());
     remove(avatar1filename.c_str());
     remove(avatar2filename.c_str());
+    return resultname;
+  }
+  std::string windowsno() {
+    std::string resultname = std::to_string(std::rand() % 1000) + ".png";
+    Image windows((char*)"./media/windows.png");
+    Image blockemoji((char*)"./media/block.png");
+    blockemoji.resizeNN(windows.w, windows.h);
+    windows.overlay(blockemoji, 0, 0);
+    windows.write(resultname.c_str());
     return resultname;
   }
 };

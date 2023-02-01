@@ -1,9 +1,20 @@
 #pragma once
 #include <dpp/dpp.h>
+#include <iostream>
+#include <cmath>
+#include <algorithm>
+#include <curl/curl.h>
+#include <stdio.h>
+#include <fstream>
+#include <sys/stat.h>
+#include <unistd.h>
+
+// #ifndef AVATARMANIPULATION
+// #include "avatar-manipulation.cpp"
+// #endif
 
 class Extras {
     public:
-
         void responses(dpp::message_create_t r_event, dpp::cluster &r_bot) {
             if (r_event.msg.content == "javascript") r_bot.message_create(dpp::message(
                 r_event.msg.channel_id, "high-level")
@@ -28,6 +39,17 @@ class Extras {
                 r_bot.message_create(dpp::message(
                     r_event.msg.channel_id, answer[selected])
                     .set_reference(r_event.msg.id));
+            }
+
+	    if (r_event.msg.content == "Windows") {
+	      Avatar avatar;
+	      std::string filename = avatar.windowsno();
+	      int selected = (std::rand() % 5);
+	      r_bot.message_create(dpp::message(
+						r_event.msg.channel_id, "**NOOOOOOOOOOOOOOOO**")
+				   .set_reference(r_event.msg.id)
+				   .add_file(filename, dpp::utility::read_file(filename)));
+	      remove(filename.c_str());
             }
 
             // https://tenor.com/view/prob-proboscis-monkey-nosaty-kahau-nosaty-kahau-gif-23018177

@@ -15,8 +15,8 @@
 #include <cmath>
 
 #include "./headers/presences.hpp"
-#include "./headers/extra-responses.hpp"
 #include "./headers/avatar-manipulation.cpp"
+#include "./headers/extra-responses.hpp"
 
 // visit dpp.dev for this dependency ;)
 #include <dpp/dpp.h>
@@ -206,35 +206,61 @@ int main() {
 
             exec("notify-send 'C++ Discord Project' '" + whosent.username + " sent: " + message + "'");
         }
+
+	if (event.command.get_command_name() == "rgb") {
+	  dpp::user author = event.command.get_issuing_user();
+	  int64_t r = std::get<int64_t>(event.get_parameter("red"));
+	  int64_t g = std::get<int64_t>(event.get_parameter("green"));
+	  int64_t b = std::get<int64_t>(event.get_parameter("blue"));
+	  int64_t a = std::get<int64_t>(event.get_parameter("alpha"));
+
+	  if (r > 255) r = 255;
+	  if (g > 255) g = 255;
+	  if (b > 255) b = 255;
+	  if (a > 1) a = 1;
+
+	  if (r < 0) r = 0;
+	  if (g < 0) g = 0;
+	  if (b < 0) b = 0;
+	  if (a < 0) a = 0;
+	  
+	  Avatar avatar;
+	  long rgba = avatar.createRGBA(r, g, b, a);
+	  long rgb = avatar.createRGB(r, g, b);
+	  
+	  event.reply(dpp::message()
+		      .add_embed(dpp::embed()
+				 .set_color(dpp::colors::green)
+				 .set_title("Prontinho.")
+				 .set_timestamp(time(0))
+				 .add_field("RGB", std::to_string(rgb), true)
+				 .add_field("RGBA", std::to_string(rgba), true)
+				 )
+		      );
+	  
+	}
+	
         if (event.command.get_command_name() == "couple") {
             dpp::user user1 = event.command.get_resolved_user(std::get<dpp::snowflake>(event.get_parameter("user1")));
             dpp::user user2 = event.command.get_resolved_user(std::get<dpp::snowflake>(event.get_parameter("user2")));
             std::string half_user1 = user1.username.substr(0, round(user1.username.length()/2));
             std::string half_user2 = user2.username.substr(round(user2.username.length()/2));
 	    
-            int porcent = std::rand() % 100;
-            std::string loading_ascii = "█▒▒▒▒▒▒▒▒▒";
+            int porcent = round(std::rand() % 100);
+            std::string loading_ascii = "▰";
+	    std::string background_ascii = "▱";
+	    std::string progress_ascii = "";
             std::uint32_t color = dpp::colors::red;
             char* emoji = (char*)"./media/vomiting.png";
 
-            if (porcent >= 35) {
-                loading_ascii = "███▒▒▒▒▒▒▒";
-		            emoji = (char*)"./media/thumbsup.png";
-            }
-            if (porcent >= 50) {
-                loading_ascii = "█████▒▒▒▒▒";
-                color = dpp::colors::forest_green;
-
-            }
-            if (porcent >= 60) {
-                loading_ascii = "███████▒▒▒";
-                color = dpp::colors::lime;
-                emoji = (char*)"heart";
-
-            }
-            if (porcent >= 100) {
-                loading_ascii = "██████████";
-            }
+	    for (int i=0; i<10;i++) {
+	      if (i<(porcent/10)) progress_ascii += loading_ascii;
+	      if (i>(porcent/10)) progress_ascii += background_ascii;
+	    }
+	    
+            if (porcent >= 35) emoji = (char*)"./media/thumbsup.png";
+            if (porcent >= 50) color = dpp::colors::forest_green;
+            if (porcent >= 60) { color = dpp::colors::lime; emoji = (char*)"heart"; }
 
             Avatar avatar;
 	    bool hasDefaultAvatar = (user1.get_avatar_url().find("embed") != std::string::npos) ||
@@ -243,7 +269,7 @@ int main() {
             event.reply(dpp::message().add_embed(dpp::embed().set_color(color)
                 .set_title("Quão compatível será esse casal?")
                 .add_field("Casal", user1.get_mention() + " e " + user2.get_mention(), true)
-                .add_field("Compatibilidade", std::string(half_user1+half_user2)+" : **"+loading_ascii+"** "+std::to_string(porcent)+"%", true)
+                .add_field("Compatibilidade", std::string(half_user1+half_user2)+" : **"+progress_ascii+"** "+std::to_string(porcent)+"%", true)
                 .set_image("attachment://" + result)
                 .set_timestamp(time(0))
                 .set_footer(dpp::embed_footer()
@@ -284,7 +310,13 @@ int main() {
         }, 10);
 
       if (dpp::run_once<struct register_bot_commands>()) {
-        dpp::slashcommand gaytest("gaytest", "mostra o quão gay alguém é.", bot.me.id);
+	dpp::slashcommand rgb("rgb", "gera um número inteiro, que vale um código RGB(A).", bot.me.id);
+	rgb.add_option( dpp::command_option(dpp::co_integer, "red", "Valor vermelho entre 0 e 255", true) );
+	rgb.add_option( dpp::command_option(dpp::co_integer, "green", "Valor verde entre 0 e 255", true) );
+	rgb.add_option( dpp::command_option(dpp::co_integer, "blue", "Valor azul entre 0 e 255", true) );
+	rgb.add_option( dpp::command_option(dpp::co_integer, "alpha", "Valor de opacidade entre 0 e 1", true) );
+	
+	dpp::slashcommand gaytest("gaytest", "mostra o quão gay alguém é.", bot.me.id);
         gaytest.add_option( dpp::command_option(dpp::co_user, "who", "Quem?", true) );
 
         dpp::slashcommand putatest("putatest", "mostra o quão puta alguém é.", bot.me.id);
@@ -297,11 +329,12 @@ int main() {
         couple.add_option( dpp::command_option(dpp::co_user, "user1", "Primeira pessoa", true) );
         couple.add_option( dpp::command_option(dpp::co_user, "user2", "Segunda pessoa", true) );
 
-        // bot.global_command_create(couple);
-        // bot.global_command_create(gaytest);
-        // bot.global_command_create(putatest);
-        // bot.global_command_create(notify);
-        bot.global_bulk_command_create({couple, gaytest, putatest, notify});
+        bot.global_command_create(couple);
+        bot.global_command_create(gaytest);
+        bot.global_command_create(putatest);
+        bot.global_command_create(notify);
+	bot.global_command_create(rgb);
+	// bot.global_bulk_command_create({couple, gaytest, putatest, notify, rgb});
       }
     });
 
