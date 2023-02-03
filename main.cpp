@@ -83,7 +83,7 @@ int main() {
             bot.shutdown();
         }
 
-        if ((event.msg.content == "please bot, recompile" || event.msg.content == "bot recompile") &&
+        if ((event.msg.content.find("bot") != std::string::npos && event.msg.content.find("recompile") != std::string::npos) &&
             (event.msg.author.id).operator nlohmann::json() == AUTHOR_ID) {
             bot.message_create(dpp::message(event.msg.channel_id, "as you wish.")
                 .set_reference(event.msg.id));
@@ -111,11 +111,11 @@ int main() {
         if (event.msg.content == PREFIX + "help") {
             dpp::embed embed = dpp::embed().
                 set_color(dpp::colors::sti_blue).
-                set_title("Hey, i'm sorry there...").
-                set_description("I ain't have a help message still, wait for a couple more decades i might give you an answer.").
+                set_title("Hey, i got some commands!").
+                set_description("Looks like you've waited a decade to this help be developed! so here i go.").
                 add_field(
-                        "I'm not gonna lie...",
-                        "It is pretty boring coding those MAKEFILES to compile my code, no cap. Would prefer Python, if it wasn't that high level. ((javascript"
+                        "I have",
+                        "/rgb /couple /gaytest /putatest and /notify-karbox-pc go testing ima fix this message later."
                 ).
                 set_timestamp(time(0)).
                 set_footer(dpp::embed_footer().set_icon(event.msg.author.get_avatar_url()).set_text(event.msg.author.username));
