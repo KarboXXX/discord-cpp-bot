@@ -63,8 +63,16 @@ private:
     return f.good();
   }
 public:
-  unsigned long createRGBA(int r, int g, int b, int a) { return ((r & 0xff) << 24) + ((g & 0xff) << 16) + ((b & 0xff) << 8) + (a & 0xff); }
-  unsigned long createRGB(int r, int g, int b)         { return ((r & 0xff) << 16) + ((g & 0xff) << 8) + (b & 0xff); }
+  int64_t createRGBA(int r, int g, int b, int a) { return ((r & 0xff) << 24) + ((g & 0xff) << 16) + ((b & 0xff) << 8) + (a & 0xff); }
+  int64_t createRGB(int r, int g, int b)         { return ((r & 0xff) << 16) + ((g & 0xff) << 8) + (b & 0xff); }
+
+  std::string generateColor(unsigned long rgb, int width, int height) {
+    Image blank(width, height, 3);
+    memset(blank.data, rgb, blank.size);
+    std::string result = std::string(std::to_string(rgb) + ".png");
+    blank.write(result.c_str());
+    return result;
+  }
   
   std::string run(std::string link1, std::string link2, char* middle, bool isDefaultAvatar) {
     const std::string resultname = std::to_string(std::rand()) + ".png";

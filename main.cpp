@@ -225,19 +225,22 @@ int main() {
 	  if (a < 0) a = 0;
 	  
 	  Avatar avatar;
-	  long rgba = avatar.createRGBA(r, g, b, a);
-	  long rgb = avatar.createRGB(r, g, b);
+	  auto rgba = avatar.createRGBA(r, g, b, a);
+	  auto rgb = avatar.createRGB(r, g, b);
+	  std::string result = avatar.generateColor(rgb, 900, 900);
 	  
 	  event.reply(dpp::message()
 		      .add_embed(dpp::embed()
-				 .set_color(dpp::colors::green)
+				 .set_color(rgb)
 				 .set_title("Prontinho.")
 				 .set_timestamp(time(0))
 				 .add_field("RGB", std::to_string(rgb), true)
 				 .add_field("RGBA", std::to_string(rgba), true)
-				 )
+				 .set_image("attachment://" + result)
+				 ).add_file(result, dpp::utility::read_file(result))
 		      );
-	  
+	remove(result.c_str());
+	
 	}
 	
         if (event.command.get_command_name() == "couple") {
