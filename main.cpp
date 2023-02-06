@@ -227,8 +227,7 @@ int main() {
 	  Avatar avatar;
 	  auto rgba = avatar.createRGBA(r, g, b, a);
 	  auto rgb = avatar.createRGB(r, g, b);
-	  std::string result = avatar.generateColor(rgb, 900, 900);
-	  
+	  	  
 	  event.reply(dpp::message()
 		      .add_embed(dpp::embed()
 				 .set_color(rgb)
@@ -236,11 +235,8 @@ int main() {
 				 .set_timestamp(time(0))
 				 .add_field("RGB", std::to_string(rgb), true)
 				 .add_field("RGBA", std::to_string(rgba), true)
-				 .set_image("attachment://" + result)
-				 ).add_file(result, dpp::utility::read_file(result))
+				 )
 		      );
-	remove(result.c_str());
-	
 	}
 	
         if (event.command.get_command_name() == "couple") {
