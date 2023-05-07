@@ -136,14 +136,15 @@ int main() {
     bot.on_slashcommand([&bot](const dpp::slashcommand_t& event) {
 
       if (event.command.get_command_name() == "sequence") {
-	int term1 = std::get<int64_t>(event.get_parameter("termo-1"));
-	int term2 = std::get<int64_t>(event.get_parameter("termo-2"));
-	int term3 = std::get<int64_t>(event.get_parameter("termo-3"));
-	int terms[] = { term1, term2, term3 };
+	double terms[] = {
+	  std::get<double>(event.get_parameter("termo-1")),
+	  std::get<double>(event.get_parameter("termo-2")),
+	  std::get<double>(event.get_parameter("termo-3"))
+	};
 	int n = std::get<int64_t>(event.get_parameter("n-termo"));
 	float r;
-	float r1 = terms[1] - terms[0];
-	float r2 = terms[2] - terms[1];
+	float r1 = (float)terms[1] - (float)terms[0];
+	float r2 = (float)terms[2] - (float)terms[1];
 	int rr1, rr2;
 	bool isPA, validSequence, rIsReal;
     
@@ -153,8 +154,8 @@ int main() {
 	  validSequence = true;
 	  if (r != std::round(r)) { rIsReal = true; } else { rIsReal = false; }
 	} else {
-	  r1 = terms[1] / terms[0];
-	  r2 = terms[2] / terms[1];
+	  r1 = (float)terms[1] / (float)terms[0];
+	  r2 = (float)terms[2] / (float)terms[1];
 	  
 	  rr1 = static_cast<int>(terms[1]) % static_cast<int>(terms[0]);
 	  rr2 = static_cast<int>(terms[2]) % static_cast<int>(terms[1]);
@@ -171,12 +172,14 @@ int main() {
 	}
 	
 	float an;
-	if (isPA) {
-	  an = terms[0] + (n - 1) * r;
+	if (isPA && validSequence) {
+	  an = (float)terms[0] + (n - 1) * r;
 	  event.reply(string_format("O %i termo é igual a %.4f de razão r=%.2f\n", n, an, r));
-	} else {
-	  an = terms[0] * std::pow(r, n-1);
+	} else if (!isPA && validSequence) {
+	  an = (float)terms[0] * std::pow(r, n-1);
 	  event.reply(string_format("O %i termo é igual a %.4f de razão q=%.4f, (%.0f de resto %i)\n", n, an, r, std::round(r), rr1));
+	} else if (!validSequence) {
+	  event.reply("A sequência não existe, razão entre termos é irregular.");
 	}
       }
 
@@ -380,9 +383,9 @@ int main() {
         putatest.add_option( dpp::command_option(dpp::co_user, "who", "Quem?", true) );
 
 	dpp::slashcommand papg("sequence", "calcula PA ou PG de uma sequência.", bot.me.id);
-	papg.add_option( dpp::command_option(dpp::co_integer, "termo-1", "Primeiro termo", true) );
-	papg.add_option( dpp::command_option(dpp::co_integer, "termo-2", "Segundo termo", true) );
-	papg.add_option( dpp::command_option(dpp::co_integer, "termo-3", "Terceiro termo", true) );
+	papg.add_option( dpp::command_option(dpp::co_number, "termo-1", "Primeiro termo", true) );
+	papg.add_option( dpp::command_option(dpp::co_number, "termo-2", "Segundo termo", true) );
+	papg.add_option( dpp::command_option(dpp::co_number, "termo-3", "Terceiro termo", true) );
 	papg.add_option( dpp::command_option(dpp::co_integer, "n-termo", "Termo que você quer descobrir", true) );
 	
         dpp::slashcommand notify("notify-karbox-pc", "manda uma notificação pro computador do karbox.", bot.me.id);
