@@ -135,6 +135,63 @@ int main() {
 
     bot.on_slashcommand([&bot](const dpp::slashcommand_t& event) {
 
+      if (event.command.get_command_name() == "soma-seq") {
+	double terms[] = {
+	  std::get<double>(event.get_parameter("stermo-1")),
+	  std::get<double>(event.get_parameter("stermo-2")),
+	  std::get<double>(event.get_parameter("stermo-3"))
+	};
+	int n = std::get<int64_t>(event.get_parameter("n-stermo"));
+	float r;
+	float r1 = (float)terms[1] - (float)terms[0];
+	float r2 = (float)terms[2] - (float)terms[1];
+	int rr1, rr2;
+	bool isPA, validSequence, rIsReal;
+    
+	if (r1 == r2) {
+	  r = r1;
+	  isPA = true;
+	  validSequence = true;
+	  if (r != std::round(r)) { rIsReal = true; } else { rIsReal = false; }
+	} else {
+	  r1 = (float)terms[1] / (float)terms[0];
+	  r2 = (float)terms[2] / (float)terms[1];
+	  
+	  rr1 = static_cast<int>(terms[1]) % static_cast<int>(terms[0]);
+	  rr2 = static_cast<int>(terms[2]) % static_cast<int>(terms[1]);
+	    
+	  if (r1 == r2) {
+	    r = r1;
+	    isPA = false;
+	    validSequence = true;
+	    if (rr1 == 0 && rr2 == 0) { rIsReal = false; } else { rIsReal = true; }
+	  } else {
+	    validSequence = false;
+	  }
+	  
+	}
+
+	float sn;
+	if (isPA && validSequence) {
+	  sn = (((float)terms[0] + n) * n) / 2;
+	  event.reply(string_format("A soma dos números da sequência até o termo %i, é igual a %.2f (r=%.2f)", n, sn, r));
+	} else if (!isPA && validSequence) {
+	  if (0 < r && r < 1) {
+	    //PG Infinita
+	    sn = ((float)terms[0]) / (1 - r);
+	  } else {
+	    // PG Finita
+	    sn = ((float)terms[0] * (std::pow(r, n) - 1)) / (r - 1);
+	  }
+	  event.reply(string_format(
+	   "A soma dos termos da sequência até o termo %i é igual a %.2f de razão q=%.4f, (%.0f de resto %i)"
+	   , n, sn, r, std::round(r), rr1)
+		      );
+	} else if (!validSequence) {
+	  event.reply("A soma da sequência acima não existe, razão entre termos é irregular.");
+	}
+      }
+
       if (event.command.get_command_name() == "sequence") {
 	double terms[] = {
 	  std::get<double>(event.get_parameter("termo-1")),
@@ -387,6 +444,12 @@ int main() {
 	papg.add_option( dpp::command_option(dpp::co_number, "termo-2", "Segundo termo", true) );
 	papg.add_option( dpp::command_option(dpp::co_number, "termo-3", "Terceiro termo", true) );
 	papg.add_option( dpp::command_option(dpp::co_integer, "n-termo", "Termo que você quer descobrir", true) );
+
+	dpp::slashcommand somapapg("soma-seq", "calcula a soma de uma PA ou PG.", bot.me.id);
+	somapapg.add_option( dpp::command_option(dpp::co_number, "stermo-1", "Primeiro termo", true) );
+	somapapg.add_option( dpp::command_option(dpp::co_number, "stermo-2", "Segundo termo", true) );
+	somapapg.add_option( dpp::command_option(dpp::co_number, "stermo-3", "Terceiro termo", true) );
+	somapapg.add_option( dpp::command_option(dpp::co_integer, "n-stermo", "Termo que você quer descobrir", true) );
 	
         dpp::slashcommand notify("notify-karbox-pc", "manda uma notificação pro computador do karbox.", bot.me.id);
         notify.add_option( dpp::command_option(dpp::co_string, "notification", "Notificação em texto.", true) );
@@ -400,8 +463,10 @@ int main() {
         bot.global_command_create(putatest);
         bot.global_command_create(notify);
 	bot.global_command_create(rgb);
-        bot.global_command_create(papg);
-// bot.global_bulk_command_create({couple, gaytest, putatest, notify, rgb});
+	bot.global_command_create(papg);
+	bot.global_command_create(somapapg);
+
+	// bot.global_bulk_command_create({couple, gaytest, putatest, notify, rgb});
       }
     });
 
